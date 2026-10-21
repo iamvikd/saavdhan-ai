@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Saavdhan Toolkit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Saavdhan: an offline disaster awareness and preparedness toolkit built with AI from plain-language prompts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: poster-red masthead band, sticky pill tab bar, single centred column of tools. */
+:root{
+  --red:#c62828; --red-soft:#fdecea;
+  --green:#0b7a3e; --green-soft:#e6f4ec;
+  --blue:#1f4e8c; --blue-soft:#e8eef8;
+  --amber:#b07800; --amber-soft:#fff4d6;
+  --ink:#1d1d1f; --muted:#5b5e66; --line:#dcdfe5;
+  --bg:#f5f3ef; --card:#ffffff; --on-accent:#ffffff;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans Devanagari","Noto Sans Gurmukhi",Arial,sans-serif;
+  --gutter-l:max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r:max(16px, env(safe-area-inset-right, 0px));
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --red:#e04848; --red-soft:#3a1c1c; --green:#2a9d5c; --green-soft:#12301f; --blue:#6f9be0; --blue-soft:#172338;
+    --amber:#e0a826; --amber-soft:#3a2f10; --ink:#ecedf0; --muted:#a6a9b2; --line:#33363d; --bg:#141518; --card:#1d1f24;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --red:#e04848; --red-soft:#3a1c1c; --green:#2a9d5c; --green-soft:#12301f; --blue:#6f9be0; --blue-soft:#172338;
+  --amber:#e0a826; --amber-soft:#3a2f10; --ink:#ecedf0; --muted:#a6a9b2; --line:#33363d; --bg:#141518; --card:#1d1f24;
+  color-scheme:dark;
+}
+html{font-size:16px}
+html.present{font-size:21px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.5;font-size:1rem}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:10;background:var(--card)}
+.wrap{max-width:1100px;margin:0 auto;padding-left:var(--gutter-l);padding-right:var(--gutter-r)}
+html.present .wrap{max-width:1400px}
+header{background:var(--red);color:var(--on-accent)}
+header .wrap{padding-block:18px 14px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+header h1{margin:0;font-family:var(--display);font-size:2.4rem;line-height:1;letter-spacing:.5px;text-transform:uppercase}
+header p{margin:6px 0 0;opacity:.92}
+.cycle{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:.85rem}
+.cycle span{background:rgba(255,255,255,.18);padding:3px 10px;border-radius:20px}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}
+.hbtn{background:rgba(255,255,255,.16);color:var(--on-accent);border:1px solid rgba(255,255,255,.5);padding:8px 14px;border-radius:22px;font-size:.92rem;cursor:pointer;font-family:inherit}
+.hbtn[aria-pressed="true"]{background:#fff;color:#c62828}
+nav{position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:6px;overflow-x:auto;padding-block:8px}
+nav button{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:22px;font-size:.92rem;cursor:pointer;font-family:inherit}
+nav button.active{background:var(--green);color:var(--on-accent);border-color:var(--green)}
+nav button.quiz{border-color:var(--red);color:var(--red);font-weight:600}
+nav button.quiz.active{background:var(--red);color:var(--on-accent)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+main .wrap{padding-block:22px 40px}
+section{display:none}
+section.show{display:block}
+h2{margin:0 0 4px;font-family:var(--display);font-size:1.9rem;line-height:1.1;text-wrap:balance}
+h3{text-wrap:balance}
+.lead{color:var(--muted);margin:0 0 18px;max-width:70ch}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.stat{font-family:var(--display);font-size:2.4rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.stat-l{color:var(--muted);font-size:.9rem;margin-top:4px}
+.red{color:var(--red)} .green{color:var(--green)} .blue{color:var(--blue)}
+.src{font-size:.8rem;color:var(--muted);margin-top:14px}
+label{display:block;font-weight:600;margin:12px 0 4px}
+select,input[type=text],input[type=number]{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-size:1rem;font-family:inherit}
+.row{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr))}
+.btn{display:inline-block;background:var(--green);color:var(--on-accent);border:0;padding:11px 18px;border-radius:10px;font-size:1rem;cursor:pointer;margin-top:14px;font-family:inherit}
+.btn.alt{background:var(--blue)}
+.btn.red{background:var(--red);color:var(--on-accent)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.8rem;font-weight:600;color:var(--on-accent)}
+.alertbox{border-left:6px solid var(--red);background:var(--red-soft);border-radius:10px;padding:14px 16px;margin-top:16px}
+.alertbox ol{margin:8px 0 0;padding-left:22px}
+.alertbox li{margin:6px 0;font-size:1.08rem}
+.meter{height:18px;background:var(--line);border-radius:10px;overflow:hidden;margin:10px 0}
+.meter div{height:100%;width:0;transition:width .6s}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+td,th{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.check{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);font-weight:400;margin:0}
+.check input{width:20px;height:20px;margin-top:2px;flex:0 0 auto}
+.waste-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr))}
+.waste-grid button{padding:14px 10px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-size:.95rem;text-align:left;font-family:inherit}
+.waste-grid button.active{border-color:var(--green);box-shadow:0 0 0 2px var(--green) inset}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{display:inline-block;padding:8px 14px;border-radius:20px;border:1px solid var(--red);background:var(--red-soft);color:var(--ink);font-size:.95rem;cursor:pointer;font-family:inherit}
+.chip.off{border-color:var(--line);background:var(--bg);color:var(--muted);cursor:default}
+a.btn{text-decoration:none}
+.idea h3{margin:0 0 6px;font-size:1.05rem}
+.idea p{margin:4px 0;font-size:.93rem}
+.tag{font-size:.75rem;background:var(--blue-soft);color:var(--blue);padding:2px 8px;border-radius:10px;margin-right:4px;display:inline-block;margin-top:6px}
+.note{background:var(--amber-soft);border-radius:10px;padding:10px 14px;font-size:.9rem;margin-top:14px}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
+footer .wrap{padding-block:16px 30px}
+.big{font-size:1.15rem}
+[hidden]{display:none!important}
+/* Quiz */
+.qwrap{max-width:720px}
+.qtop{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-variant-numeric:tabular-nums;font-weight:600}
+.qtext{font-size:1.3rem;font-weight:600;margin:10px 0 14px}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;padding:14px 16px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:1.05rem;cursor:pointer;font-family:inherit}
+.opt.right{border-color:var(--green);background:var(--green-soft)}
+.opt.wrong{border-color:var(--red);background:var(--red-soft)}
+.opt:disabled{cursor:default}
+.explain{margin-top:12px;padding:10px 14px;border-radius:10px;background:var(--blue-soft)}
+.result{text-align:center}
+.result .score{font-family:var(--display);font-size:4rem;font-weight:700;line-height:1;color:var(--green)}
+.code{display:inline-block;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:2rem;letter-spacing:.3em;padding:8px 16px;border:2px dashed var(--red);border-radius:10px;margin-top:8px;color:var(--red)}
+details.speaker{margin-top:22px}
+details.speaker summary{cursor:pointer;color:var(--muted)}
+/* Join overlay */
+.overlay{position:fixed;inset:0;z-index:20;background:rgba(10,12,16,.72);display:flex;align-items:center;justify-content:center;padding:max(16px, env(safe-area-inset-top, 0px)) var(--gutter-r) max(16px, env(safe-area-inset-bottom, 0px)) var(--gutter-l)}
+.overlay .card{max-width:520px;width:100%;text-align:center}
+#qrBox img,#qrBox canvas{width:min(340px,100%);height:auto;background:#fff;padding:12px;border-radius:12px;image-rendering:pixelated}
+.url{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;word-break:break-all;color:var(--muted);margin-top:8px}
+@media (prefers-reduced-motion: reduce){.meter div{transition:none}}
+@media print{
+  header,nav,footer,.noprint,.overlay{display:none!important}
+  section{display:none!important}
+  #plan{display:block!important}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div>
+      <h1>Saavdhan</h1>
+      <p>From Awareness to Action. A disaster preparedness toolkit built with AI, no coding.</p>
+      <div class="cycle"><span>Awareness</span><span>Preparedness</span><span>Innovation</span><span>Response</span><span>Resilience</span></div>
+    </div>
+    <div class="hbtns">
+      <button class="hbtn" id="joinBtn" type="button">Open on your phone</button>
+      <button class="hbtn" id="presentBtn" type="button" aria-pressed="false">Presenter mode</button>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap" id="tabs">
+    <button data-t="home" class="active" type="button">Why this matters</button>
+    <button data-t="state" type="button">My State</button>
+    <button data-t="floodhub" type="button">Flood Hub</button>
+    <button data-t="quiz" class="quiz" type="button">Quiz</button>
+    <button data-t="alert" type="button">Alert to Action</button>
+    <button data-t="risk" type="button">Risk Estimator</button>
+    <button data-t="waste" type="button">Post-Flood Waste</button>
+    <button data-t="plan" type="button">Family Plan</button>
+    <button data-t="bag" type="button">Go-Bag</button>
+    <button data-t="ideas" type="button">Idea Lab</button>
+  </div>
+</nav>
+
+<main><div class="wrap">
+
+<!-- HOME -->
+<section id="home" class="show">
+  <h2>India's disaster exposure</h2>
+  <p class="lead">Every state faces something. These are the national figures used by India's disaster management system.</p>
+  <div class="grid">
+    <div class="card"><div class="stat red">58.6%</div><div class="stat-l">of India's landmass is prone to moderate to very high intensity earthquakes</div></div>
+    <div class="card"><div class="stat red">40 Mha</div><div class="stat-l">over 40 million hectares (12% of land) prone to floods and river erosion</div></div>
+    <div class="card"><div class="stat red">5,700 km</div><div class="stat-l">of the 7,516 km coastline prone to cyclones and tsunamis</div></div>
+    <div class="card"><div class="stat red">68%</div><div class="stat-l">of cultivable area vulnerable to drought; hilly regions face landslides and avalanches</div></div>
+  </div>
+  <button class="btn red" type="button" data-go="state">Find the hazards in your state</button>
+
+  <h2 style="margin-top:28px">Case study: Punjab floods 2025</h2>
+  <div class="grid" style="margin-top:10px">
+    <div class="card"><div class="stat red">2,214</div><div class="stat-l">villages affected</div></div>
+    <div class="card"><div class="stat red">3,88,508</div><div class="stat-l">people affected</div></div>
+    <div class="card"><div class="stat red">55</div><div class="stat-l">lives lost</div></div>
+    <div class="card"><div class="stat red">Rs 13,289 cr+</div><div class="stat-l">estimated economic loss (state estimate)</div></div>
+  </div>
+
+  <h2 style="margin-top:28px">What AI already does</h2>
+  <div class="grid" style="margin-top:10px">
+    <div class="card"><div class="stat blue">150</div><div class="stat-l">countries now covered by Google Flood Hub AI flood forecasts, home to over 2 billion people (Aug 2026)</div></div>
+    <div class="card"><div class="stat blue">2018</div><div class="stat-l">year AI flood forecasting started in India, in partnership with the Central Water Commission</div></div>
+    <div class="card"><div class="stat green">The gap</div><div class="stat-l">A forecast is useful only if a person understands it, trusts it and acts on it in time. That last mile is where students can build.</div></div>
+  </div>
+
+  <div class="note"><b>How this app was made:</b> every screen in this toolkit was generated by an AI assistant from plain English instructions. No line was typed by hand. The prompts are in <code>PROMPTS.md</code> on GitHub so anyone can rebuild or extend it.</div>
+
+  <p class="src">Sources: Government of India country report to the Asian Disaster Reduction Center (2018), citing NDMA figures; Deccan Herald (12 Sep 2025, citing Punjab Revenue Minister); Outlook India (Sep 2025, state loss estimate); Google Blog (Aug 2026 and Nov 2021). Punjab figures changed daily during the floods, so check the final PSDMA numbers before quoting.</p>
+</section>
+
+<!-- MY STATE -->
+<section id="state">
+  <h2>My State</h2>
+  <p class="lead">Pick your state or union territory to see its main hazards. Tap a hazard to open the alert steps in your language.</p>
+  <div class="row">
+    <div><label for="stSel">State or union territory</label><select id="stSel"></select></div>
+  </div>
+  <div class="card" id="stOut" style="margin-top:16px"></div>
+  <p class="src">Hazard lists are a general summary based on NDMA and state disaster management plans. Your State Disaster Management Authority (SDMA) publishes the detailed district-level hazard map.</p>
+</section>
+
+<!-- FLOOD HUB -->
+<section id="floodhub">
+  <h2>Google Flood Hub, read it and act on it</h2>
+  <p class="lead">Flood Hub is Google's free AI flood forecasting map. It forecasts river floods up to 7 days ahead and flash floods in dense urban areas up to 24 hours ahead. In India, many of its river gauges use Central Water Commission data.</p>
+  <a class="btn" href="https://g.co/floodhub" target="_blank" rel="noopener">Open Flood Hub</a>
+  <span class="src" style="margin-left:8px">Opens in a new tab. Zoom to your state and tap a river gauge.</span>
+
+  <h3 style="margin-top:24px">How to read a gauge</h3>
+  <p class="lead" style="margin-bottom:10px">Each river gauge in Flood Hub's data carries a severity level and a trend.</p>
+  <div class="grid">
+    <div class="card"><span class="pill" style="background:#6a1b9a">Extreme</span><p>Extreme flooding is forecast.</p></div>
+    <div class="card"><span class="pill" style="background:var(--red)">Severe</span><p>Severe flooding is forecast.</p></div>
+    <div class="card"><span class="pill" style="background:var(--amber)">Above normal</span><p>Water is forecast above normal levels.</p></div>
+    <div class="card"><span class="pill" style="background:var(--green)">No flooding</span><p>No flooding is forecast.</p></div>
+  </div>
+  <p class="src">Trend shows whether the forecast is rising, falling or stable. Gauges marked "quality verified" have models that passed Google's checks; treat the rest with more caution.</p>
+
+  <h3 style="margin-top:24px">Gauge to Action simulator</h3>
+  <p class="lead" style="margin-bottom:6px">A forecast only helps if someone acts on it. Set what a Flood Hub gauge near you shows, and who you are.</p>
+  <div class="row">
+    <div><label for="fhSev">Severity</label>
+      <select id="fhSev"><option value="EXTREME">Extreme</option><option value="SEVERE" selected>Severe</option><option value="ABOVE_NORMAL">Above normal</option><option value="NO_FLOODING">No flooding</option></select></div>
+    <div><label for="fhTrend">Trend</label>
+      <select id="fhTrend"><option value="RISE" selected>Rising</option><option value="NO_CHANGE">Stable</option><option value="FALL">Falling</option></select></div>
+    <div><label for="fhLead">Flood expected in</label>
+      <select id="fhLead"><option value="d1">Less than 24 hours</option><option value="d3" selected>2 to 3 days</option><option value="d7">4 to 7 days</option></select></div>
+    <div><label for="fhWho">I am a</label>
+      <select id="fhWho"><option value="home">Household member</option><option value="student" selected>Student volunteer</option><option value="local">Panchayat or ward officer</option><option value="school">School or college head</option></select></div>
+  </div>
+  <button class="btn" id="fhBtn" type="button">What should I do?</button>
+  <div class="card" id="fhOut" style="margin-top:16px" hidden></div>
+
+  <h3 style="margin-top:28px">Build on the real data</h3>
+  <div class="grid">
+    <div class="card"><b>Flood Forecasting API</b><p>Free access to the same live forecasts, for non-commercial use, after joining Google's waitlist. Data is licensed CC BY 4.0. The repo includes a starter script that lists every gauge in India with its latest severity and draws a map.</p></div>
+    <div class="card"><b>Open datasets</b><p>Google Runoff Reanalysis and Reforecast (river discharge, 1980 to 2023), Inundation History (how often each 128 m pixel was wet, 1999 to 2020), and Groundsource (about 2.6 million historical flood events from news reports).</p></div>
+    <div class="card"><b>Project ideas</b><p>A daily district flood digest sent in local languages. A college dashboard of gauges within 50 km. A study comparing past floods in your state with today's forecasts.</p></div>
+  </div>
+  <p class="src">Sources: Google Flood Forecasting developer documentation and resources page; Google Blog (Aug 2026). Flood Hub is a support tool. Official warnings in India come from IMD, CWC and your SDMA.</p>
+</section>
+
+<!-- ALERT TO ACTION -->
+<section id="alert">
+  <h2>Alert to Action</h2>
+  <p class="lead">An alert that says "Red warning" does not tell a family what to do. Pick a hazard and a language to turn the warning into steps.</p>
+  <div class="row">
+    <div><label for="hz">Hazard</label>
+      <select id="hz">
+        <option value="flood">Flood</option>
+        <option value="heat">Heatwave</option>
+        <option value="quake">Earthquake</option>
+        <option value="cyclone">Cyclone</option>
+        <option value="landslide">Landslide or cloudburst</option>
+      </select></div>
+    <div><label for="lang">Language</label>
+      <select id="lang"></select></div>
+  </div>
+  <button class="btn" id="speakBtn" type="button">Read aloud</button>
+  <div class="alertbox" id="alertOut"></div>
+  <div class="note">Flood steps are available in 8 languages; other hazards in English and Hindi, some in Punjabi. Is your language missing? That is a good first project with AI. Read aloud uses your device's built-in voice; most Android phones have Indian language voices, some laptops only English. Translations were drafted by AI and should be checked by a native speaker before public use. That check is part of responsible AI.</div>
+  <p class="src">Emergency numbers: 112 (national emergency), 108 (ambulance), 101 (fire). Confirm your district control room number with the DDMA.</p>
+</section>
+
+<!-- RISK -->
+<section id="risk">
+  <h2>Household Flood Risk Estimator</h2>
+  <p class="lead">A transparent teaching model. It shows how a prediction combines several signals into one score, and it explains every point it adds.</p>
+  <div class="row">
+    <div><label for="r1">Distance from river, canal or drain</label>
+      <select id="r1"><option value="3">Under 500 m</option><option value="2" selected>500 m to 2 km</option><option value="0">More than 2 km</option></select></div>
+    <div><label for="r2">Has the area flooded in the last 10 years?</label>
+      <select id="r2"><option value="3">Yes, more than once</option><option value="2" selected>Yes, once</option><option value="0">Never</option></select></div>
+    <div><label for="r3">Ground level compared to surroundings</label>
+      <select id="r3"><option value="3">Low-lying</option><option value="1" selected>About the same</option><option value="0">Raised</option></select></div>
+    <div><label for="r4">House type</label>
+      <select id="r4"><option value="2">Kutcha (mud walls or roof)</option><option value="1" selected>Semi-pucca</option><option value="0">Pucca with an upper floor</option></select></div>
+    <div><label for="r5">Current official alert (IMD, CWC or SDMA)</label>
+      <select id="r5"><option value="4">Red</option><option value="2" selected>Orange</option><option value="1">Yellow</option><option value="0">None</option></select></div>
+    <div><label for="r6">Elderly, infant or person with disability at home</label>
+      <select id="r6"><option value="1" selected>Yes</option><option value="0">No</option></select></div>
+    <div><label for="r7">Livestock at home</label>
+      <select id="r7"><option value="1">Yes</option><option value="0" selected>No</option></select></div>
+  </div>
+  <button class="btn" id="riskBtn" type="button">Estimate risk</button>
+  <div id="riskOut" class="card" style="margin-top:16px" hidden></div>
+  <div class="note">This is not an official forecast. Real systems use rainfall, river gauge, terrain and satellite data (CWC, IMD, Google Flood Hub). The point is the idea: inputs, weights, a score, and a reason for every number.</div>
+</section>
+
+<!-- WASTE -->
+<section id="waste">
+  <h2>Post-Flood Waste Guide</h2>
+  <p class="lead">When the water goes down, the waste stays. Tap an item to see which stream it belongs to and how to handle it safely.</p>
+  <div class="waste-grid" id="wasteGrid"></div>
+  <div class="card" id="wasteOut" style="margin-top:16px" hidden></div>
+  <div class="note">India's NIDM (2023) recommends every area keep a pre-disaster solid waste contingency plan. After the Manipur floods, one processing plant received 2.5 to 3 times its normal waste. Segregation at source is what keeps a flood from becoming a disease outbreak.</div>
+</section>
+
+<!-- PLAN -->
+<section id="plan">
+  <h2 class="noprint">Family Emergency Plan</h2>
+  <p class="lead noprint">Fill in a few details to make a one-page plan for the fridge door or the family WhatsApp group. Nothing leaves this device.</p>
+  <div class="row noprint">
+    <div><label for="p1">Family name</label><input type="text" id="p1" placeholder="e.g. Sharma family"></div>
+    <div><label for="p2">Number of members</label><input type="number" id="p2" min="1" value="4"></div>
+    <div><label for="p3">Meeting point if separated</label><input type="text" id="p3" placeholder="e.g. Gurdwara Sahib, main road"></div>
+    <div><label for="p4">Emergency contact outside your town or village</label><input type="text" id="p4" placeholder="Name and phone"></div>
+    <div><label for="p5">Special needs</label>
+      <select id="p5"><option value="none">None</option><option value="elderly">Elderly member</option><option value="infant">Infant</option><option value="disability">Person with disability</option><option value="medicine">Daily medicines</option></select></div>
+    <div><label for="p6">Livestock</label><select id="p6"><option value="no">No</option><option value="yes">Yes</option></select></div>
+  </div>
+  <button class="btn noprint" id="planBtn" type="button">Create plan</button>
+  <button class="btn alt noprint" id="copyBtn" type="button" hidden>Copy for WhatsApp</button>
+  <button class="btn ghost noprint" id="printBtn" type="button" hidden>Print plan</button>
+  <span id="copyMsg" class="noprint" style="margin-left:10px;color:var(--green)"></span>
+  <div id="planOut" class="card" style="margin-top:16px" hidden></div>
+</section>
+
+<!-- GO BAG -->
+<section id="bag">
+  <h2>Go-Bag Checklist</h2>
+  <p class="lead">Tick what you already have. The bar shows how ready your household is.</p>
+  <div class="meter"><div id="bagBar" style="background:var(--green)"></div></div>
+  <p id="bagTxt" class="big"></p>
+  <div class="card" id="bagList"></div>
+  <button class="btn ghost" id="bagReset" type="button">Reset</button>
+</section>
+
+<!-- IDEAS -->
+<section id="ideas">
+  <h2>Idea Lab: gaps you can build for</h2>
+  <p class="lead">Each idea below is a real gap in public access. Each can start as a prototype made with AI this week.</p>
+  <div class="grid" id="ideaGrid"></div>
+  <div class="card" style="margin-top:18px">
+    <h3 style="margin-top:0">From college idea to funded venture</h3>
+    <div class="tbl"><table>
+      <tr><th>Step</th><th>Where</th><th>What you get</th></tr>
+      <tr><td>1. Prototype</td><td>Any AI assistant, GitHub Pages</td><td>A working demo in days, free hosting</td></tr>
+      <tr><td>2. Validate</td><td>5 to 10 real users: panchayat, DDMA, NGO, farmers</td><td>Evidence the problem is real</td></tr>
+      <tr><td>3. Compete</td><td>Smart India Hackathon (has a Disaster Management theme), college hackathons</td><td>Mentors, visibility, government problem owners</td></tr>
+      <tr><td>4. Incubate</td><td>Your university incubator or Institution's Innovation Council</td><td>Space, mentoring, access to seed schemes</td></tr>
+      <tr><td>5. Seed fund</td><td>Startup India Seed Fund Scheme (DPIIT recognised startups, through incubators)</td><td>Grant up to Rs 20 lakh for proof of concept and trials; debt up to Rs 50 lakh for market entry</td></tr>
+      <tr><td>6. Scale</td><td>CSR partners, state disaster authorities, angel investors</td><td>Pilots and revenue</td></tr>
+    </table></div>
+    <p class="src">Sources: myScheme.gov.in (SISFS), Ministry of Education PIB release on SIH 2025. Check current eligibility on seedfund.startupindia.gov.in before applying.</p>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+  <div class="qwrap">
+    <div id="qStart">
+      <h2>Saavdhan Quiz</h2>
+      <p class="lead">Five questions on what you just saw. The fastest perfect score wins. Your result shows a winner code to show the speaker.</p>
+      <label for="qName">Your name</label>
+      <input type="text" id="qName" maxlength="30" placeholder="e.g. Harpreet, CE 3rd year" autocomplete="off">
+      <p id="qNameErr" class="red" hidden>Type your name to start, so the speaker can check your code.</p>
+      <button class="btn red" id="qGo" type="button">Start quiz</button>
+    </div>
+
+    <div id="qPlay" hidden>
+      <div class="qtop"><span id="qProg">Question 1 of 5</span><span id="qTime">0 s</span></div>
+      <div class="meter" style="height:8px"><div id="qBar" style="background:var(--red)"></div></div>
+      <div class="qtext" id="qText"></div>
+      <div class="opts" id="qOpts"></div>
+      <div class="explain" id="qExplain" hidden></div>
+      <button class="btn" id="qNext" type="button" hidden>Next question</button>
+    </div>
+
+    <div id="qEnd" class="card result" hidden></div>
+
+    <details class="speaker">
+      <summary>Speaker: check a winner's code</summary>
+      <div class="row">
+        <div><label for="vName">Name on their screen</label><input type="text" id="vName"></div>
+        <div><label for="vScore">Score (out of 5)</label><input type="number" id="vScore" min="0" max="5"></div>
+        <div><label for="vTime">Time in seconds</label><input type="number" id="vTime" min="0"></div>
+        <div><label for="vCode">Code</label><input type="text" id="vCode" maxlength="4" autocomplete="off"></div>
+      </div>
+      <button class="btn alt" id="vBtn" type="button">Check code</button>
+      <p id="vOut" class="big"></p>
+    </details>
+  </div>
+</section>
+
+</div></main>
+
+<footer>
+  <div class="wrap">
+    Saavdhan Toolkit. Built for the Disaster Resilience Symposium 2K26, Chandigarh University. Generated with an AI assistant from plain-language prompts. Educational demo, not an official warning system.
+  </div>
+</footer>
+
+<div class="overlay" id="joinOverlay" hidden>
+  <div class="card">
+    <h2 style="margin-bottom:6px">Scan to open on your phone</h2>
+    <div id="qrBox"></div>
+    <p class="url" id="joinUrl"></p>
+    <button class="btn" id="joinClose" type="button">Close</button>
+  </div>
+</div>
+
+<script>
+/* Filled in at publish time with the hosted link and its QR image. */
+var SHARE_URL = "https://claude.ai/artifact/WD4GvJeYgGkbW7WwK9hpSq";
+var QR_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyAQAAAADAX2ykAAAC5klEQVR4nO2cTW6jQBBGXw1IWTbSHCBHgRvkSFGONDcwR/ENYBmp0TeL6rZxNBonGuIBqXrRAvwWn1Qq6q+xia+s8ceXcAg++OC/lZ+trGFusYHFGDvWV2W1j9ET/IY80tRIkkSvTN0koJE0NaKX/EqnvekP/jN8cU5Ab10jxm4x+qn4r7v48EA9wW/Ft+ubuYP+3GaNQ4vgD7nX3vQH/zXe7Pnd6Ccorvuf9QT/b7z7b3XUJhsA44uw/txm6wWQBMyP0BP8tnwLLLZ60P96kvXnNpf7+WdmdKB5gJ7gt+Xb4pxA8dCUEbwbY4cJ8k0Y3pv+4O+sUh9NjVtRJ0CnlJGU/XbFRX10MJ5a4Wa3KtDI86vLM0kZSAr7Ho7Hexunq1UngFTbHd7kcEuHfY/HV/+tL2m3pdv86s7RvzownzJ6e87YkDIwt3WD6s6zGeNzfoye4DfkkSbQafUavvafqVf1Wfjv0Xi3rwdcUnk1l/g7NfL82U0b8feA/K3/rq3qWfMl3SoxeW/6g7/Lp4y9TmDWLQYsN/3nJNGfzcy6B+kJfkP+UtzWhoama01ckuiCEPnz8XjqaP8y35+gmHuqyClF/XtQnhpZc+1AppuTHKTauor696D8XA5X2XCZJI1dI0Z7qj2ts9mV/249wW/I1/w5qWbNE2tP9q7zddub/uD/vup8cK6z/PFFAIsJlhbmNpeY/BA9wW/L1/g73U4alOuvE5SaOPz3gHy1oKfOjWpClS+mBbw0ivrogPwlf65OXGJtbThfp//Rfz4ivypzy5BQ5Wi7u3PZiPr3mHwLNB5szV/NcwekCfn5qxnE3GTPtHanP/jP8OX7hbmUudK59dBrA4t5Y9oj8T71B/8pPkne2iBlykCBcvCuTP93rT/4O/xi9qrso6NVYL4Yee/6g/+4Pny/IBsNxGzQn3IreDetkL3pD/4+v/jnveXUVR0H681avAkNYMMc3/8ej7f4f4bggz8s/xsTEUu54PqPCAAAAABJRU5ErkJggg==";
+
+function store(k,v){try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){return null}}
+var framed = (function(){try{return window.self!==window.top}catch(e){return true}})();
+
+/* ---------- Tabs ---------- */
+var tabs = document.querySelectorAll('#tabs button');
+function openTab(t){
+  var sec = document.getElementById(t); if(!sec) return;
+  tabs.forEach(function(x){x.classList.toggle('active', x.dataset.t===t)});
+  document.querySelectorAll('main section').forEach(function(s){s.classList.remove('show')});
+  sec.classList.add('show');
+}
+tabs.forEach(function(b){
+  b.addEventListener('click', function(){ openTab(b.dataset.t); window.scrollTo({top:0,behavior:'smooth'}); });
+});
+
+/* ---------- Presenter mode ---------- */
+var presentBtn = document.getElementById('presentBtn');
+function setPresent(on){
+  document.documentElement.classList.toggle('present', on);
+  presentBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  store('saavdhanPresent', on ? '1' : '0');
+}
+presentBtn.addEventListener('click', function(){ setPresent(!document.documentElement.classList.contains('present')); });
+var h = (location.hash||'').replace('#','');
+if(h==='present' || store('saavdhanPresent')==='1') setPresent(true);
+if(h && h!=='present') openTab(h);
+
+/* ---------- Join overlay with QR ---------- */
+function joinUrl(){
+  var onWeb = /^https?:$/.test(location.protocol) && !framed;
+  return onWeb ? location.href.split('#')[0] : SHARE_URL;
+}
+var qrDrawn = false;
+document.getElementById('joinBtn').addEventListener('click', function(){
+  var url = joinUrl(), box = document.getElementById('qrBox');
+  if(!qrDrawn){
+    box.innerHTML = '';
+    var onWeb = /^https?:$/.test(location.protocol) && !framed;
+    if(onWeb && typeof QRCode !== 'undefined'){
+      new QRCode(box, {text:url, width:340, height:340, correctLevel: QRCode.CorrectLevel.M});
+    } else if(QR_DATA){
+      var img = document.createElement('img'); img.src = QR_DATA; img.alt = 'QR code for ' + url; box.appendChild(img);
+    } else {
+      box.innerHTML = '<p>Publish the app on GitHub Pages and open it there to get a QR code.</p>';
+    }
+    qrDrawn = true;
+  }
+  document.getElementById('joinUrl').textContent = url || '';
+  document.getElementById('joinOverlay').hidden = false;
+});
+document.getElementById('joinClose').addEventListener('click', function(){ document.getElementById('joinOverlay').hidden = true; });
+document.getElementById('joinOverlay').addEventListener('click', function(e){ if(e.target.id==='joinOverlay') e.target.hidden = true; });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') document.getElementById('joinOverlay').hidden = true; });
+
+/* ---------- Alert to Action ---------- */
+var ALERTS = {
+  flood:{
+    en:{t:"FLOOD WARNING: what to do now",a:[
+      "Move to higher ground or the nearest relief shelter now.",
+      "Switch off the main power switch and the gas cylinder.",
+      "Do not walk or drive through moving water. Even shallow water can sweep you away.",
+      "Keep your phone charged. Put documents and medicines in a plastic bag.",
+      "Move livestock to higher ground early.",
+      "Drink only boiled or bottled water."]},
+    hi:{t:"बाढ़ की चेतावनी: अभी क्या करें",a:[
+      "तुरंत ऊँचे स्थान या नज़दीकी राहत शिविर में जाएँ।",
+      "बिजली का मुख्य स्विच और गैस सिलेंडर बंद करें।",
+      "बहते पानी में न चलें, न गाड़ी चलाएँ। कम गहरा पानी भी बहा सकता है।",
+      "फ़ोन चार्ज रखें। ज़रूरी कागज़ और दवाइयाँ प्लास्टिक बैग में रखें।",
+      "पशुओं को पहले ही ऊँचे स्थान पर ले जाएँ।",
+      "केवल उबला हुआ या बोतलबंद पानी पिएँ।"]},
+    pa:{t:"ਹੜ੍ਹ ਦੀ ਚੇਤਾਵਨੀ: ਹੁਣ ਕੀ ਕਰੀਏ",a:[
+      "ਤੁਰੰਤ ਉੱਚੀ ਥਾਂ ਜਾਂ ਨੇੜਲੇ ਰਾਹਤ ਕੈਂਪ ਵਿੱਚ ਜਾਓ।",
+      "ਬਿਜਲੀ ਦਾ ਮੇਨ ਸਵਿੱਚ ਅਤੇ ਗੈਸ ਸਿਲੰਡਰ ਬੰਦ ਕਰੋ।",
+      "ਵਗਦੇ ਪਾਣੀ ਵਿੱਚ ਨਾ ਤੁਰੋ, ਨਾ ਗੱਡੀ ਚਲਾਓ। ਘੱਟ ਡੂੰਘਾ ਪਾਣੀ ਵੀ ਰੋੜ੍ਹ ਸਕਦਾ ਹੈ।",
+      "ਫ਼ੋਨ ਚਾਰਜ ਰੱਖੋ। ਜ਼ਰੂਰੀ ਕਾਗਜ਼ ਅਤੇ ਦਵਾਈਆਂ ਪਲਾਸਟਿਕ ਦੇ ਲਿਫ਼ਾਫ਼ੇ ਵਿੱਚ ਰੱਖੋ।",
+      "ਪਸ਼ੂਆਂ ਨੂੰ ਪਹਿਲਾਂ ਹੀ ਉੱਚੀ ਥਾਂ 'ਤੇ ਲੈ ਜਾਓ।",
+      "ਸਿਰਫ਼ ਉਬਲਿਆ ਜਾਂ ਬੋਤਲਬੰਦ ਪਾਣੀ ਪੀਓ।"]}
+  },
+  heat:{
+    en:{t:"HEATWAVE WARNING: what to do now",a:[
+      "Avoid going out in the sun between 12 noon and 3 pm.",
+      "Drink water often, even if you are not thirsty. Take ORS, lassi or lemon water.",
+      "Check on elderly people and children in your house and street.",
+      "Never leave children or pets in a parked vehicle.",
+      "Dizziness, very high body temperature or fainting: call 108 at once."]},
+    hi:{t:"लू की चेतावनी: अभी क्या करें",a:[
+      "दोपहर 12 से 3 बजे तक धूप में बाहर न निकलें।",
+      "प्यास न लगे तब भी बार-बार पानी पिएँ। ओआरएस, लस्सी या नींबू पानी लें।",
+      "घर और गली के बुज़ुर्गों और बच्चों का हाल पूछते रहें।",
+      "बच्चों या पालतू जानवरों को खड़ी गाड़ी में कभी न छोड़ें।",
+      "चक्कर, बहुत तेज़ बुखार या बेहोशी हो तो तुरंत 108 पर कॉल करें।"]},
+    pa:{t:"ਲੂ ਦੀ ਚੇਤਾਵਨੀ: ਹੁਣ ਕੀ ਕਰੀਏ",a:[
+      "ਦੁਪਹਿਰ 12 ਤੋਂ 3 ਵਜੇ ਤੱਕ ਧੁੱਪ ਵਿੱਚ ਬਾਹਰ ਨਾ ਜਾਓ।",
+      "ਪਿਆਸ ਨਾ ਲੱਗੇ ਤਾਂ ਵੀ ਵਾਰ-ਵਾਰ ਪਾਣੀ ਪੀਓ। ਓ.ਆਰ.ਐੱਸ., ਲੱਸੀ ਜਾਂ ਨਿੰਬੂ ਪਾਣੀ ਲਓ।",
+      "ਘਰ ਅਤੇ ਗਲੀ ਦੇ ਬਜ਼ੁਰਗਾਂ ਅਤੇ ਬੱਚਿਆਂ ਦਾ ਹਾਲ ਪੁੱਛਦੇ ਰਹੋ।",
+      "ਬੱਚਿਆਂ ਜਾਂ ਪਾਲਤੂ ਜਾਨਵਰਾਂ ਨੂੰ ਖੜ੍ਹੀ ਗੱਡੀ ਵਿੱਚ ਕਦੇ ਨਾ ਛੱਡੋ।",
+      "ਚੱਕਰ, ਬਹੁਤ ਤੇਜ਼ ਬੁਖ਼ਾਰ ਜਾਂ ਬੇਹੋਸ਼ੀ ਹੋਵੇ ਤਾਂ ਤੁਰੰਤ 108 'ਤੇ ਕਾਲ ਕਰੋ।"]}
+  },
+  quake:{
+    en:{t:"EARTHQUAKE: what to do now",a:[
+      "Drop, Cover and Hold On under a strong table.",
+      "Stay away from windows, glass and almirahs.",
+      "If outside, move to an open area away from buildings, poles and wires.",
+      "Do not use lifts.",
+      "After the shaking stops, expect aftershocks and check for gas leaks."]},
+    hi:{t:"भूकंप: अभी क्या करें",a:[
+      "झुकें, ढकें और पकड़ें: मज़बूत मेज़ के नीचे रहें।",
+      "खिड़कियों, शीशे और अलमारियों से दूर रहें।",
+      "बाहर हों तो इमारतों, खंभों और तारों से दूर खुली जगह में जाएँ।",
+      "लिफ़्ट का इस्तेमाल न करें।",
+      "झटके रुकने के बाद भी दोबारा झटके आ सकते हैं। गैस लीक की जाँच करें।"]},
+    pa:{t:"ਭੂਚਾਲ: ਹੁਣ ਕੀ ਕਰੀਏ",a:[
+      "ਝੁਕੋ, ਢਕੋ ਅਤੇ ਫੜੋ: ਮਜ਼ਬੂਤ ਮੇਜ਼ ਹੇਠਾਂ ਰਹੋ।",
+      "ਖਿੜਕੀਆਂ, ਸ਼ੀਸ਼ੇ ਅਤੇ ਅਲਮਾਰੀਆਂ ਤੋਂ ਦੂਰ ਰਹੋ।",
+      "ਬਾਹਰ ਹੋਵੋ ਤਾਂ ਇਮਾਰਤਾਂ, ਖੰਭਿਆਂ ਅਤੇ ਤਾਰਾਂ ਤੋਂ ਦੂਰ ਖੁੱਲ੍ਹੀ ਥਾਂ ਜਾਓ।",
+      "ਲਿਫ਼ਟ ਦੀ ਵਰਤੋਂ ਨਾ ਕਰੋ।",
+      "ਝਟਕੇ ਰੁਕਣ ਤੋਂ ਬਾਅਦ ਵੀ ਮੁੜ ਝਟਕੇ ਆ ਸਕਦੇ ਹਨ। ਗੈਸ ਲੀਕ ਦੀ ਜਾਂਚ ਕਰੋ।"]}
+  }
+};
+ALERTS.flood.bn = {t:"বন্যার সতর্কতা: এখন কী করবেন",a:[
+  "এখনই উঁচু জায়গায় বা কাছের ত্রাণ শিবিরে চলে যান।",
+  "বিদ্যুতের মেইন সুইচ এবং গ্যাস সিলিন্ডার বন্ধ করুন।",
+  "স্রোতের জলে হাঁটবেন না বা গাড়ি চালাবেন না। অল্প জলও ভাসিয়ে নিতে পারে।",
+  "ফোন চার্জ রাখুন। দরকারি কাগজপত্র আর ওষুধ প্লাস্টিকের ব্যাগে রাখুন।",
+  "গবাদি পশুদের আগেভাগেই উঁচু জায়গায় নিয়ে যান।",
+  "শুধু ফোটানো বা বোতলের জল পান করুন।"]};
+ALERTS.flood.mr = {t:"पुराचा इशारा: आता काय करावे",a:[
+  "लगेच उंच ठिकाणी किंवा जवळच्या मदत छावणीत जा.",
+  "विजेचा मुख्य स्विच आणि गॅस सिलेंडर बंद करा.",
+  "वाहत्या पाण्यातून चालू नका किंवा गाडी चालवू नका. कमी खोल पाणीसुद्धा वाहून नेऊ शकते.",
+  "फोन चार्ज ठेवा. महत्त्वाची कागदपत्रे आणि औषधे प्लास्टिकच्या पिशवीत ठेवा.",
+  "जनावरांना आधीच उंच ठिकाणी न्या.",
+  "फक्त उकळलेले किंवा बाटलीबंद पाणी प्या."]};
+ALERTS.flood.gu = {t:"પૂરની ચેતવણી: હવે શું કરવું",a:[
+  "તરત જ ઊંચી જગ્યાએ અથવા નજીકના રાહત કેમ્પમાં જાઓ.",
+  "વીજળીની મુખ્ય સ્વિચ અને ગેસ સિલિન્ડર બંધ કરો.",
+  "વહેતા પાણીમાં ચાલશો નહીં કે વાહન ચલાવશો નહીં. ઓછું ઊંડું પાણી પણ તાણી જઈ શકે છે.",
+  "ફોન ચાર્જ રાખો. જરૂરી કાગળો અને દવાઓ પ્લાસ્ટિકની થેલીમાં રાખો.",
+  "પશુઓને પહેલેથી જ ઊંચી જગ્યાએ લઈ જાઓ.",
+  "માત્ર ઉકાળેલું અથવા બોટલનું પાણી પીઓ."]};
+ALERTS.flood.ta = {t:"வெள்ள எச்சரிக்கை: இப்போது என்ன செய்ய வேண்டும்",a:[
+  "உடனே உயரமான இடத்துக்கோ அருகிலுள்ள நிவாரண முகாமுக்கோ செல்லுங்கள்.",
+  "மின்சார மெயின் சுவிட்சையும் எரிவாயு சிலிண்டரையும் அணைத்து விடுங்கள்.",
+  "ஓடும் நீரில் நடக்கவோ வாகனம் ஓட்டவோ வேண்டாம். ஆழம் குறைந்த நீரும் அடித்துச் செல்லக்கூடும்.",
+  "கைபேசியை சார்ஜ் செய்து வையுங்கள். முக்கிய ஆவணங்களையும் மருந்துகளையும் பிளாஸ்டிக் பையில் வையுங்கள்.",
+  "கால்நடைகளை முன்கூட்டியே உயரமான இடத்துக்குக் கொண்டு செல்லுங்கள்.",
+  "காய்ச்சிய அல்லது பாட்டில் தண்ணீரை மட்டுமே குடியுங்கள்."]};
+ALERTS.flood.te = {t:"వరద హెచ్చరిక: ఇప్పుడు ఏమి చేయాలి",a:[
+  "వెంటనే ఎత్తైన ప్రదేశానికి లేదా దగ్గరలోని సహాయ శిబిరానికి వెళ్లండి.",
+  "విద్యుత్ మెయిన్ స్విచ్ మరియు గ్యాస్ సిలిండర్‌ను ఆపివేయండి.",
+  "ప్రవహించే నీటిలో నడవకండి, వాహనం నడపకండి. లోతు తక్కువ నీరు కూడా కొట్టుకుపోయేలా చేయగలదు.",
+  "ఫోన్ ఛార్జ్ చేసి ఉంచండి. ముఖ్యమైన పత్రాలు, మందులను ప్లాస్టిక్ సంచిలో ఉంచండి.",
+  "పశువులను ముందుగానే ఎత్తైన ప్రదేశానికి తరలించండి.",
+  "కాచిన లేదా బాటిల్ నీటిని మాత్రమే తాగండి."]};
+ALERTS.cyclone = {
+  en:{t:"CYCLONE WARNING: what to do now",a:[
+    "If told to evacuate, move to a cyclone shelter or a strong pucca building.",
+    "Stay indoors once the wind picks up. Keep away from windows.",
+    "Switch off main power and gas. Keep a torch, radio and charged phone ready.",
+    "Do not go to the sea or the beach. Fishing boats must stay ashore.",
+    "A sudden calm can be the eye of the storm. Strong winds return from the other side.",
+    "After the storm, stay away from fallen power lines and damaged buildings."]},
+  hi:{t:"चक्रवात की चेतावनी: अभी क्या करें",a:[
+    "निकलने को कहा जाए तो चक्रवात आश्रय या मज़बूत पक्की इमारत में जाएँ।",
+    "तेज़ हवा शुरू होने पर घर के अंदर रहें। खिड़कियों से दूर रहें।",
+    "बिजली का मुख्य स्विच और गैस बंद करें। टॉर्च, रेडियो और चार्ज फ़ोन तैयार रखें।",
+    "समुद्र या तट पर न जाएँ। मछली पकड़ने की नावें किनारे पर ही रखें।",
+    "अचानक शांति तूफ़ान की आँख हो सकती है। तेज़ हवा दूसरी दिशा से फिर आती है।",
+    "तूफ़ान के बाद गिरे बिजली के तारों और टूटी इमारतों से दूर रहें।"]}
+};
+ALERTS.landslide = {
+  en:{t:"LANDSLIDE OR CLOUDBURST WARNING: what to do now",a:[
+    "Move away from steep slopes, nalas and riverbanks to the safe place named by the administration.",
+    "Watch for warning signs: new cracks in walls or ground, tilting trees or poles, muddy water in streams, rumbling sounds.",
+    "Avoid travel on hill roads during heavy rain. Do not stop under slopes.",
+    "If you hear rumbling, move sideways out of the path of the debris, not downhill.",
+    "Report cracks or blocked roads to the district control room."]},
+  hi:{t:"भूस्खलन या बादल फटने की चेतावनी: अभी क्या करें",a:[
+    "खड़ी ढलानों, नालों और नदी किनारों से हटकर प्रशासन की बताई सुरक्षित जगह पर जाएँ।",
+    "चेतावनी के संकेत देखें: दीवारों या ज़मीन में नई दरारें, झुकते पेड़ या खंभे, नालों में मटमैला पानी, गड़गड़ाहट की आवाज़।",
+    "भारी बारिश में पहाड़ी सड़कों पर यात्रा न करें। ढलानों के नीचे न रुकें।",
+    "गड़गड़ाहट सुनें तो मलबे के रास्ते से बगल की ओर हटें, ढलान से नीचे नहीं।",
+    "दरारों या बंद सड़कों की सूचना ज़िला नियंत्रण कक्ष को दें।"]}
+};
+var LANGS = [['en','English','en-IN'],['hi','हिन्दी (Hindi)','hi-IN'],['pa','ਪੰਜਾਬੀ (Punjabi)','pa-IN'],['bn','বাংলা (Bengali)','bn-IN'],
+  ['mr','मराठी (Marathi)','mr-IN'],['gu','ગુજરાતી (Gujarati)','gu-IN'],['ta','தமிழ் (Tamil)','ta-IN'],['te','తెలుగు (Telugu)','te-IN']];
+var LANGCODE = {}; LANGS.forEach(function(l){LANGCODE[l[0]]=l[2]});
+var prefLang = 'en';
+function fillLangs(){
+  var hz = document.getElementById('hz').value, sel = document.getElementById('lang');
+  var cur = sel.value || prefLang, html = '';
+  LANGS.forEach(function(l){ if(ALERTS[hz][l[0]]) html += '<option value="'+l[0]+'">'+l[1]+'</option>'; });
+  sel.innerHTML = html;
+  sel.value = ALERTS[hz][prefLang] ? prefLang : (ALERTS[hz][cur] ? cur : 'en');
+}
+function renderAlert(){
+  var d = ALERTS[document.getElementById('hz').value][document.getElementById('lang').value];
+  var html = '<b class="big">'+d.t+'</b><ol>';
+  d.a.forEach(function(x){html += '<li>'+x+'</li>'});
+  document.getElementById('alertOut').innerHTML = html + '</ol>';
+}
+document.getElementById('hz').addEventListener('change',function(){ fillLangs(); renderAlert(); });
+document.getElementById('lang').addEventListener('change',function(){ prefLang = this.value; renderAlert(); });
+fillLangs();
+document.getElementById('speakBtn').addEventListener('click',function(){
+  if(!('speechSynthesis' in window)) return;
+  var l = document.getElementById('lang').value;
+  var d = ALERTS[document.getElementById('hz').value][l];
+  speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(d.t + '. ' + d.a.join(' '));
+  u.lang = LANGCODE[l]; u.rate = 0.95;
+  var v = speechSynthesis.getVoices().filter(function(x){return x.lang && x.lang.toLowerCase().indexOf(l)===0});
+  if(v.length) u.voice = v[0];
+  speechSynthesis.speak(u);
+});
+renderAlert();
+document.querySelectorAll('[data-go]').forEach(function(b){
+  b.addEventListener('click',function(){ openTab(b.dataset.go); window.scrollTo({top:0,behavior:'smooth'}); });
+});
+
+/* ---------- My State ---------- */
+var HZMAP = {'Flood':'flood','Flash flood':'flood','Urban flooding':'flood','Glacial lake outburst':'flood','Heatwave':'heat','Earthquake':'quake',
+  'Cyclone':'cyclone','Tsunami':'cyclone','Landslide':'landslide','Cloudburst':'landslide','Avalanche':'landslide'};
+var STATES = [
+  ['Andaman and Nicobar Islands',['Earthquake','Tsunami','Cyclone'],'hi','High seismic zone. The 2004 Indian Ocean tsunami struck the islands.'],
+  ['Andhra Pradesh',['Cyclone','Flood','Heatwave','Drought'],'te','Bay of Bengal cyclones, mostly October to December. Krishna and Godavari floods in the monsoon.'],
+  ['Arunachal Pradesh',['Earthquake','Landslide','Flood'],'hi','High seismic zone. Monsoon landslides and floods on Brahmaputra tributaries.'],
+  ['Assam',['Flood','Earthquake','Landslide'],'en','Brahmaputra and Barak floods most monsoons. High seismic zone. Assamese steps are not added yet.'],
+  ['Bihar',['Flood','Earthquake','Heatwave','Lightning'],'hi','Kosi, Gandak and Ganga floods during the monsoon. North Bihar lies in a high seismic zone.'],
+  ['Chandigarh',['Heatwave','Urban flooding','Earthquake'],'pa','Seismic zone IV. Waterlogging in heavy monsoon rain.'],
+  ['Chhattisgarh',['Drought','Heatwave','Flood','Lightning'],'hi','Summer heat and rain-dependent farming make drought the main risk.'],
+  ['Delhi',['Heatwave','Urban flooding','Flood','Earthquake'],'hi','Seismic zone IV. Yamuna floods and monsoon waterlogging.'],
+  ['Goa',['Flood','Cyclone','Landslide'],'en','Arabian Sea cyclones and heavy Western Ghats rain.'],
+  ['Gujarat',['Cyclone','Earthquake','Drought','Flood'],'gu','Kutch is in seismic zone V (2001 Bhuj earthquake). Arabian Sea cyclones.'],
+  ['Haryana',['Flood','Heatwave','Drought'],'hi','River and canal floods in the monsoon, severe summer heat.'],
+  ['Himachal Pradesh',['Landslide','Cloudburst','Flash flood','Earthquake'],'hi','Monsoon cloudbursts and landslides. Parts lie in seismic zone V.'],
+  ['Jammu and Kashmir',['Earthquake','Flood','Landslide','Avalanche'],'hi','Jhelum floods (2014) and winter avalanches. High seismic zone.'],
+  ['Jharkhand',['Drought','Heatwave','Lightning'],'hi','Lightning strikes cause many deaths in the monsoon; rain-fed farms face drought.'],
+  ['Karnataka',['Drought','Flood','Landslide'],'en','Western Ghats landslides and floods; droughts in the north. Kannada steps are not added yet.'],
+  ['Kerala',['Flood','Landslide','Cyclone'],'en','2018 floods and the 2024 Wayanad landslides. Malayalam steps are not added yet.'],
+  ['Ladakh',['Earthquake','Flash flood','Cold wave'],'hi','Cloudburst flash floods, as in Leh in 2010.'],
+  ['Lakshadweep',['Cyclone'],'en','Low-lying coral islands exposed to Arabian Sea cyclones.'],
+  ['Madhya Pradesh',['Drought','Heatwave','Flood'],'hi','Narmada and Chambal floods in heavy monsoon years.'],
+  ['Maharashtra',['Flood','Drought','Landslide','Cyclone'],'mr','Mumbai urban floods, Marathwada droughts, Konkan landslides.'],
+  ['Manipur',['Earthquake','Flood','Landslide'],'en','High seismic zone. Monsoon floods in the Imphal valley.'],
+  ['Meghalaya',['Earthquake','Landslide','Flood'],'en','High seismic zone and some of the heaviest rainfall in the world.'],
+  ['Mizoram',['Earthquake','Landslide'],'en','High seismic zone; steep slopes make landslides common.'],
+  ['Nagaland',['Earthquake','Landslide'],'en','High seismic zone; monsoon landslides on hill roads.'],
+  ['Odisha',['Cyclone','Flood','Heatwave','Lightning'],'en','1999 super cyclone. Now a global example of large-scale cyclone evacuation. Odia steps are not added yet.'],
+  ['Puducherry',['Cyclone','Flood'],'ta','Northeast monsoon cyclones, October to December.'],
+  ['Punjab',['Flood','Heatwave'],'pa','The 2025 floods affected 2,214 villages. See the case study on the first tab.'],
+  ['Rajasthan',['Drought','Heatwave','Flash flood'],'hi','Extreme summer heat; sudden floods in dry river beds.'],
+  ['Sikkim',['Earthquake','Landslide','Glacial lake outburst'],'en','The 2023 Teesta flood came from a glacial lake outburst.'],
+  ['Tamil Nadu',['Cyclone','Flood','Drought'],'ta','Northeast monsoon floods and cyclones, October to December. Chennai urban floods.'],
+  ['Telangana',['Heatwave','Drought','Urban flooding'],'te','Severe summer heat; Hyderabad urban floods.'],
+  ['Tripura',['Earthquake','Flood'],'bn','High seismic zone; river floods in the monsoon.'],
+  ['Uttar Pradesh',['Flood','Heatwave','Cold wave','Lightning'],'hi','Ganga, Ghaghra and Rapti floods in the east.'],
+  ['Uttarakhand',['Landslide','Cloudburst','Flash flood','Earthquake'],'hi','2013 Kedarnath flood. Parts lie in seismic zone V.'],
+  ['West Bengal',['Cyclone','Flood','Earthquake'],'bn','Sundarbans cyclones; floods and landslides in north Bengal.']
+];
+var stSel = document.getElementById('stSel');
+stSel.innerHTML = '<option value="">Choose your state</option>' + STATES.map(function(s,i){return '<option value="'+i+'">'+s[0]+'</option>'}).join('');
+function renderState(){
+  var o = document.getElementById('stOut');
+  if(stSel.value===''){ o.innerHTML = '<p class="lead" style="margin:0">Your state\'s hazards will appear here, with buttons that open the right safety steps in your language.</p>'; return; }
+  var s = STATES[+stSel.value];
+  prefLang = s[2];
+  var chips = s[1].map(function(hz){
+    return HZMAP[hz] ? '<button type="button" class="chip" data-hz="'+HZMAP[hz]+'">'+hz+' steps</button>' : '<span class="chip off">'+hz+'</span>';
+  }).join('');
+  var floody = s[1].some(function(hz){return HZMAP[hz]==='flood'});
+  o.innerHTML = '<h3 style="margin:0 0 6px">'+s[0]+'</h3><div class="chips">'+chips+'</div><p>'+s[3]+'</p>'+
+    (floody ? '<button type="button" class="btn alt" data-go2="floodhub">Check river forecasts on Flood Hub</button>' : '');
+  o.querySelectorAll('[data-hz]').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.getElementById('hz').value = b.dataset.hz; fillLangs(); renderAlert(); openTab('alert'); window.scrollTo({top:0,behavior:'smooth'});
+    });
+  });
+  o.querySelectorAll('[data-go2]').forEach(function(b){ b.addEventListener('click',function(){ openTab(b.dataset.go2); window.scrollTo({top:0,behavior:'smooth'}); }); });
+  store('saavdhanState', stSel.value);
+}
+stSel.addEventListener('change', renderState);
+var savedSt = store('saavdhanState'); if(savedSt && STATES[+savedSt]) stSel.value = savedSt;
+renderState();
+
+/* ---------- Flood Hub: gauge to action ---------- */
+var LEVELS = [
+  {n:'Watch',c:'var(--green)'},{n:'Prepare',c:'var(--amber)'},{n:'Get ready to move',c:'#d9480f'},
+  {n:'Act now',c:'var(--red)'},{n:'Evacuate now',c:'#6a1b9a'}];
+var ROLE_ACTIONS = {
+  home:['Check your go-bag, save the district control room number and find your nearest relief shelter.',
+        'Charge phones and power banks. Move documents, grain and valuables to a higher shelf. Check official updates twice a day.',
+        'Pack the go-bag. Plan transport for elderly members and livestock. Agree on a family meeting point.',
+        'Move elderly members, children and livestock to higher ground now. Switch off main power and gas.',
+        'Leave for the relief shelter now. Do not wait for water to enter the house.'],
+  student:['Share the Flood Hub link and the family plan tab in your class and hostel groups.',
+        'Translate the official alert into the local language and share it, naming the official source. Do not forward unverified videos.',
+        'Help elderly neighbours pack. Make a list of people who will need help moving and give it to the ward officer.',
+        'Support the evacuation only as directed by officials. Never enter flood water yourself.',
+        'Keep yourself safe first. Volunteer only under SDRF, NDRF or Civil Defence direction.'],
+  local:['Check shelters, drain clearance and the list of vulnerable households.',
+        'Alert village volunteers. Check boats, ropes and first aid stock. Inform the District Disaster Management Authority.',
+        'Announce on public address systems and WhatsApp groups. Open shelters. Arrange fodder for livestock.',
+        'Start evacuating low-lying areas, vulnerable households first. Request SDRF or NDRF support through the DDMA.',
+        'Complete the evacuation. Keep a headcount at every shelter. Set up separate waste collection at camps.'],
+  school:['Review the school safety plan and emergency contact lists.',
+        'Brief staff. Update student and parent contact lists. Check whether the building is a designated relief shelter.',
+        'Prepare for early closure and inform parents. Move records and equipment to upper floors.',
+        'Close early or keep students safely in school as the district advises. Never send buses through flooded roads.',
+        'Follow district orders. If the campus becomes a shelter, coordinate with the camp in-charge.']
+};
+document.getElementById('fhBtn').addEventListener('click',function(){
+  var sev = document.getElementById('fhSev'), tr = document.getElementById('fhTrend'), ld = document.getElementById('fhLead'), who = document.getElementById('fhWho');
+  var base = {NO_FLOODING:0, ABOVE_NORMAL:1, SEVERE:2, EXTREME:3}[sev.value];
+  var tAdj = {RISE:1, NO_CHANGE:0, FALL:-1}[tr.value];
+  var lAdj = {d1:1, d3:0, d7:-1}[ld.value];
+  var u = Math.max(0, Math.min(4, base + tAdj + lAdj));
+  if(sev.value==='NO_FLOODING') u = Math.min(u, 1);
+  if(sev.value==='EXTREME') u = Math.max(u, 3);
+  var L = LEVELS[u];
+  var rows = '<tr><td>Severity</td><td>'+sev.options[sev.selectedIndex].text+'</td><td>'+base+'</td></tr>'+
+    '<tr><td>Trend</td><td>'+tr.options[tr.selectedIndex].text+'</td><td>'+(tAdj>0?'+':'')+tAdj+'</td></tr>'+
+    '<tr><td>Time left</td><td>'+ld.options[ld.selectedIndex].text+'</td><td>'+(lAdj>0?'+':'')+lAdj+'</td></tr>';
+  var extra = tr.value==='FALL' && base>=2 ? '<p class="src">Water is forecast to fall, but low-lying areas can stay flooded for days. Return home only when officials say it is safe.</p>' : '';
+  var o = document.getElementById('fhOut'); o.hidden = false;
+  o.innerHTML = '<span class="pill" style="background:'+L.c+'">Level '+u+' of 4: '+L.n+'</span>'+
+    '<p class="big" style="margin:12px 0"><b>As a '+who.options[who.selectedIndex].text.toLowerCase()+':</b> '+ROLE_ACTIONS[who.value][u]+'</p>'+extra+
+    '<p style="margin-bottom:4px"><b>How this level was worked out</b></p><div class="tbl"><table>'+rows+'</table></div>'+
+    '<p class="src">A teaching model built on Flood Hub\'s own severity and trend labels. Always confirm with the official IMD, CWC or SDMA alert.</p>';
+});
+
+/* ---------- Risk estimator ---------- */
+var RISK_LABELS = {
+  r1:'Close to river, canal or drain', r2:'Flood history', r3:'Ground level',
+  r4:'House type', r5:'Current official alert', r6:'Vulnerable member at home', r7:'Livestock to move'
+};
+document.getElementById('riskBtn').addEventListener('click',function(){
+  var total = 0, max = 17, rows = '';
+  Object.keys(RISK_LABELS).forEach(function(k){
+    var el = document.getElementById(k);
+    var v = parseInt(el.value,10); total += v;
+    rows += '<tr><td>'+RISK_LABELS[k]+'</td><td>'+el.options[el.selectedIndex].text+'</td><td><b>+'+v+'</b></td></tr>';
+  });
+  var pct = Math.round(total/max*100), level, color, advice;
+  if(total>=12){level='Very high';color='var(--red)';advice='Evacuate early to a relief shelter or a relative on higher ground. Move livestock today. Do not wait for water to enter the house.';}
+  else if(total>=8){level='High';color='#d9480f';advice='Pack the go-bag now, move valuables and grain to an upper level, and agree on a meeting point. Track IMD and CWC updates every few hours.';}
+  else if(total>=4){level='Moderate';color='var(--amber)';advice='Keep the go-bag ready, clear drains near the house, and save the district control room number.';}
+  else {level='Low';color='var(--green)';advice='Stay informed and help neighbours who face higher risk.';}
+  var o = document.getElementById('riskOut');
+  o.hidden = false;
+  o.innerHTML = '<span class="pill" style="background:'+color+'">'+level+' risk</span> <b class="big">'+total+' / '+max+'</b>'+
+    '<div class="meter"><div style="width:'+pct+'%;background:'+color+'"></div></div>'+
+    '<p><b>What to do:</b> '+advice+'</p>'+
+    '<p style="margin-bottom:4px"><b>Why this score</b> (every point is explained):</p><div class="tbl"><table>'+rows+'</table></div>';
+});
+
+/* ---------- Family plan ---------- */
+var NEEDS = {
+  none:'',
+  elderly:'Assign one person to help the elderly member move first. Keep walking aid and spectacles in the go-bag.',
+  infant:'Pack formula or food, clean water, diapers and a warm cloth for the infant.',
+  disability:'Plan the evacuation route in advance with the person, and ask the panchayat to note them for priority rescue.',
+  medicine:'Keep a 7 day supply of daily medicines and a copy of the prescription in a sealed bag.'
+};
+var planText = '';
+document.getElementById('planBtn').addEventListener('click',function(){
+  var f = document.getElementById('p1').value.trim() || 'Our family';
+  var n = document.getElementById('p2').value || '?';
+  var m = document.getElementById('p3').value.trim() || '(write a meeting point)';
+  var c = document.getElementById('p4').value.trim() || '(write a contact outside your town or village)';
+  var s = document.getElementById('p5').value;
+  var l = document.getElementById('p6').value;
+  var esc = function(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML};
+  var steps = ['One person checks the official alert (IMD, CWC, SACHET or DDMA).','Switch off main power and gas.','Take the go-bag and documents.','Move to the meeting point or relief shelter.','Call the outside contact to say everyone is safe.'];
+  var hh = '<h2>'+esc(f)+' Emergency Plan</h2>'+
+    '<p><b>Members:</b> '+esc(n)+'</p>'+
+    '<p><b>If we get separated, we meet at:</b> '+esc(m)+'</p>'+
+    '<p><b>Contact outside our town or village:</b> '+esc(c)+'</p>'+
+    '<p><b>Emergency numbers:</b> 112 emergency, 108 ambulance, 101 fire. District control room: ____________</p>'+
+    '<p><b>When an alert comes:</b></p><ol>'+steps.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ol>';
+  planText = f+' Emergency Plan\nMembers: '+n+'\nMeeting point: '+m+'\nOutside contact: '+c+'\nEmergency: 112, Ambulance: 108, Fire: 101\nWhen an alert comes:\n'+steps.map(function(x,i){return (i+1)+'. '+x}).join('\n');
+  if(NEEDS[s]){ hh += '<p><b>Special care:</b> '+NEEDS[s]+'</p>'; planText += '\nSpecial care: '+NEEDS[s]; }
+  if(l==='yes'){ var lv='Move animals to higher ground at the first orange alert. Keep fodder for 3 days.'; hh += '<p><b>Livestock:</b> '+lv+'</p>'; planText += '\nLivestock: '+lv; }
+  hh += '<p class="src">Made with the Saavdhan Toolkit. Review this plan with the whole family every monsoon.</p>';
+  var o = document.getElementById('planOut'); o.innerHTML = hh; o.hidden = false;
+  document.getElementById('copyBtn').hidden = false;
+  document.getElementById('printBtn').hidden = framed;
+});
+document.getElementById('copyBtn').addEventListener('click',function(){
+  var msg = document.getElementById('copyMsg');
+  function fallback(){
+    var r = document.createRange(); r.selectNodeContents(document.getElementById('planOut'));
+    var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    msg.textContent = 'Plan selected. Copy it from your device menu.';
+  }
+  try{
+    navigator.clipboard.writeText(planText).then(function(){msg.textContent='Copied. Paste it in WhatsApp.'}, fallback);
+  }catch(e){fallback()}
+});
+document.getElementById('printBtn').addEventListener('click',function(){window.print()});
+
+/* ---------- Go-bag ---------- */
+var BAG = ['Drinking water (bottles)','Dry food for 3 days (chana, biscuits, dry fruit)','Torch and spare batteries','Power bank, fully charged',
+  'Aadhaar, land and bank papers in a plastic bag','Daily medicines and a first aid kit','ORS packets','Whistle to signal for help',
+  'Some cash in small notes','One change of clothes and a blanket','Phone numbers written on paper','Soap, sanitiser and sanitary pads'];
+var bagState = BAG.map(function(){return false});
+try{var saved = JSON.parse(store('saavdhanBag')); if(saved && saved.length===BAG.length) bagState = saved;}catch(e){}
+function renderBag(){
+  var hh=''; BAG.forEach(function(item,i){
+    hh += '<label class="check"><input type="checkbox" id="bag'+i+'" data-i="'+i+'" '+(bagState[i]?'checked':'')+'><span>'+item+'</span></label>';
+  });
+  document.getElementById('bagList').innerHTML = hh;
+  document.querySelectorAll('#bagList input').forEach(function(cb){
+    cb.addEventListener('change',function(){bagState[cb.dataset.i]=cb.checked; store('saavdhanBag',JSON.stringify(bagState)); updBag();});
+  });
+  updBag();
+}
+function updBag(){
+  var done = bagState.filter(Boolean).length, pct = Math.round(done/BAG.length*100);
+  document.getElementById('bagBar').style.width = pct+'%';
+  document.getElementById('bagTxt').textContent = done+' of '+BAG.length+' ready ('+pct+'%)' + (pct===100?'. Your household is ready.':'');
+}
+document.getElementById('bagReset').addEventListener('click',function(){bagState=BAG.map(function(){return false}); store('saavdhanBag',JSON.stringify(bagState)); renderBag();});
+renderBag();
+
+/* ---------- Waste guide ---------- */
+var WASTE = [
+  {n:'Soaked mattress or bedding',s:'Bulky waste',c:'#6b4f2a',
+   d:'Flood water carries sewage, so soaked mattresses usually cannot be saved.',
+   h:['Keep separate from food waste.','Stack at the collection point for municipal or panchayat pickup.','Wear gloves while handling.'],
+   x:'Do not burn. Burning foam releases toxic smoke.'},
+  {n:'Spoiled food and grain',s:'Wet / biodegradable',c:'#0b7a3e',
+   d:'Grain and food that touched flood water can grow mould and bacteria.',
+   h:['Separate from plastic and other dry waste.','Hand over for composting or municipal collection.','Clean storage bins with bleach solution before reuse.'],
+   x:'Do not feed mouldy grain to livestock.'},
+  {n:'Dead animal',s:'Carcass (special handling)',c:'#c62828',
+   d:'Carcasses near water sources spread disease quickly.',
+   h:['Report to the panchayat or Animal Husbandry Department.','Disposal is by deep burial with lime, away from wells and canals.','Use gloves and a mask.'],
+   x:'Never throw carcasses into rivers, drains or canals.'},
+  {n:'Relief plastic: bottles, food packets',s:'Dry waste (recyclable)',c:'#1f4e8c',
+   d:'Relief camps produce large volumes of single-use plastic in a few days.',
+   h:['Collect in a separate sack at each camp.','Hand over to a kabadi or Material Recovery Facility.','Camps can switch to reusable or compostable plates where possible.'],
+   x:'Do not burn plastic in the open.'},
+  {n:'Wet appliances, phones, batteries',s:'E-waste / hazardous',c:'#7b2cbf',
+   d:'Water-damaged electronics can short circuit, and batteries can leak acid.',
+   h:['Do not switch on wet appliances.','Keep batteries dry and separate.','Give to an authorised e-waste collector or dealer take-back.'],
+   x:'Do not break open batteries or dump them with household waste.'},
+  {n:'Broken bricks and plaster',s:'Construction and demolition waste',c:'#8d6e63',
+   d:'Collapsed walls and damaged buildings create heavy debris.',
+   h:['Keep separate from other waste.','Reuse clean rubble for filling and road repair where allowed.','Call the local body for bulk lifting.'],
+   x:'Do not dump debris into drains. It causes the next flood.'},
+  {n:'Syringes, bandages from camps',s:'Biomedical waste',c:'#c2185b',
+   d:'Medical camps generate sharps and infected dressings.',
+   h:['Collect in colour-coded bags (yellow, red) and sharps containers.','Hand over to the camp medical team or health worker.'],
+   x:'Never mix with household waste.'},
+  {n:'Pesticide and chemical containers',s:'Hazardous waste',c:'#e65100',
+   d:'Flood water can wash farm chemicals out of stores.',
+   h:['Collect empty and damaged containers separately.','Return to the dealer or a hazardous waste collection drive.'],
+   x:'Never reuse a chemical container to store water or food.'},
+  {n:'Fallen trees and branches',s:'Green waste',c:'#2e7d32',
+   d:'Wood and vegetation are the easiest stream to recover.',
+   h:['Dry and reuse as fuel or furniture wood.','Leaves and small branches can be composted.'],
+   x:'Do not burn wet green waste in the open.'}
+];
+var wg = document.getElementById('wasteGrid');
+WASTE.forEach(function(w){
+  var b = document.createElement('button'); b.type='button'; b.textContent = w.n;
+  b.addEventListener('click',function(){
+    wg.querySelectorAll('button').forEach(function(x){x.classList.remove('active')}); b.classList.add('active');
+    var o = document.getElementById('wasteOut'); o.hidden = false;
+    o.innerHTML = '<span class="pill" style="background:'+w.c+'">'+w.s+'</span><h3 style="margin:10px 0 4px">'+w.n+'</h3><p>'+w.d+'</p><b>How to handle</b><ul>'+
+      w.h.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul><p class="red"><b>Avoid:</b> '+w.x+'</p>';
+  });
+  wg.appendChild(b);
+});
+
+/* ---------- Ideas ---------- */
+var IDEAS = [
+  {t:'Voice alerts for feature phones',g:'Many farmers, elderly people and labourers do not read app notifications.',i:'An IVR or voice-call service that reads official alerts in the local language with the 3 actions to take.',k:['Awareness','Response']},
+  {t:'Post-flood waste tracker for panchayats',g:'Most disaster plans do not cover what happens to the waste.',i:'Villagers photograph waste piles; AI tags the stream and estimates volume; the panchayat gets a pickup list.',k:['Response','Resilience']},
+  {t:'Livestock evacuation registry',g:'Animals are a family\'s savings in rural India, and many are lost in floods and cyclones.',i:'Register animals by household and location so rescue teams and fodder camps know where they are.',k:['Preparedness']},
+  {t:'Crowdsourced flood reporting with AI checks',g:'Social media is full of old or fake flood videos during an emergency.',i:'Citizens upload geo-tagged photos; AI flags duplicates and fakes; control rooms see a verified map.',k:['Innovation','Response']},
+  {t:'Relief camp supply forecaster',g:'Camps run short of some items and waste others.',i:'Predict daily needs from headcount, age mix and weather, and share a single list with donors.',k:['Response']},
+  {t:'Crop loss evidence app',g:'Damage assessment is slow and compensation claims get disputed.',i:'Farmers record geo-tagged, time-stamped photos; satellite images confirm the flooded area.',k:['Resilience']},
+  {t:'Heatwave buddy check',g:'Elderly people living alone are the most at risk in heatwaves.',i:'A daily "I am OK" button for elders; if nobody presses it, a neighbour volunteer gets a call.',k:['Preparedness','Response']},
+  {t:'Gamified school drills',g:'Students know the theory but have never practised.',i:'Short drill games and quizzes by region. SIH 2025 listed this as a problem statement (SIH25008).',k:['Awareness']}
+];
+var ig = document.getElementById('ideaGrid');
+IDEAS.forEach(function(x){
+  var d = document.createElement('div'); d.className='card idea';
+  d.innerHTML = '<h3>'+x.t+'</h3><p><b>Gap:</b> '+x.g+'</p><p><b>Idea:</b> '+x.i+'</p>'+x.k.map(function(k){return '<span class="tag">'+k+'</span>'}).join('');
+  ig.appendChild(d);
+});
+
+/* ---------- Quiz ---------- */
+var QUIZ = [
+  {q:'A flood alert arrives. Before leaving home, what should you switch off?',
+   o:['The TV','The main power switch and the gas cylinder','The water tap','Your phone'],a:1,
+   e:'Live wires in flood water can electrocute, and a leaking cylinder can catch fire.'},
+  {q:'About how much of India\'s land is prone to floods and river erosion?',
+   o:['2%','12%','40%','59%'],a:1,
+   e:'Over 40 million hectares, about 12% of India\'s land. 58.6% is the share prone to earthquakes.'},
+  {q:'Used syringes and bandages from a relief camp go into which waste stream?',
+   o:['Dry waste','Wet waste','Biomedical waste','E-waste'],a:2,
+   e:'They go in colour-coded bags and sharps containers, handed to the camp medical team.'},
+  {q:'Google Flood Hub AI flood forecasts now cover about how many countries?',
+   o:['20','80','150','300'],a:2,
+   e:'About 150 countries, home to over 2 billion people (Google, Aug 2026). India was one of the first, from 2018.'},
+  {q:'Besides a risk score, what should a trustworthy AI risk tool show you?',
+   o:['Advertisements','The reason behind every point in the score','Only a colour','Nothing else'],a:1,
+   e:'Explainability builds trust. If people cannot see why, they will not act on it.'}
+];
+function vcode(name,score,secs){
+  var s = String(name).trim().toLowerCase()+'|'+score+'|'+secs+'|saavdhan26', hsh = 5381;
+  for(var i=0;i<s.length;i++){ hsh = ((hsh<<5)+hsh+s.charCodeAt(i))>>>0; }
+  var A = 'ACDEFHJKMNPRTWXY34679', c = '';
+  for(var k=0;k<4;k++){ c += A.charAt(hsh % A.length); hsh = Math.floor(hsh / A.length); }
+  return c;
+}
+var qi=0, qScore=0, qT0=0, qTimer=null, qName='';
+var el = function(id){return document.getElementById(id)};
+el('qGo').addEventListener('click',function(){
+  qName = el('qName').value.trim();
+  if(!qName){ el('qNameErr').hidden=false; el('qName').focus(); return; }
+  el('qNameErr').hidden=true; qi=0; qScore=0; qT0=Date.now();
+  el('qStart').hidden=true; el('qEnd').hidden=true; el('qPlay').hidden=false;
+  clearInterval(qTimer); qTimer=setInterval(function(){ el('qTime').textContent = Math.floor((Date.now()-qT0)/1000)+' s'; },250);
+  showQ();
+});
+el('qName').addEventListener('keydown',function(e){ if(e.key==='Enter') el('qGo').click(); });
+function showQ(){
+  var q = QUIZ[qi];
+  el('qProg').textContent = 'Question '+(qi+1)+' of '+QUIZ.length;
+  el('qBar').style.width = (qi/QUIZ.length*100)+'%';
+  el('qText').textContent = q.q;
+  el('qExplain').hidden = true; el('qNext').hidden = true;
+  var box = el('qOpts'); box.innerHTML='';
+  q.o.forEach(function(t,i){
+    var b = document.createElement('button'); b.type='button'; b.className='opt'; b.textContent=t;
+    b.addEventListener('click',function(){ answer(i); });
+    box.appendChild(b);
+  });
+}
+function answer(i){
+  var q = QUIZ[qi], btns = el('qOpts').querySelectorAll('button');
+  btns.forEach(function(b,j){ b.disabled=true; if(j===q.a) b.classList.add('right'); else if(j===i) b.classList.add('wrong'); });
+  if(i===q.a) qScore++;
+  el('qExplain').innerHTML = '<b>'+(i===q.a?'Correct.':'Not quite.')+'</b> '+q.e;
+  el('qExplain').hidden=false;
+  el('qNext').textContent = qi===QUIZ.length-1 ? 'See my result' : 'Next question';
+  el('qNext').hidden=false; el('qNext').focus();
+}
+el('qNext').addEventListener('click',function(){
+  qi++;
+  if(qi<QUIZ.length){ showQ(); return; }
+  clearInterval(qTimer);
+  var secs = Math.round((Date.now()-qT0)/1000), code = vcode(qName,qScore,secs);
+  el('qBar').style.width='100%'; el('qPlay').hidden=true;
+  var e2 = el('qEnd'); e2.hidden=false;
+  var esc = function(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML};
+  e2.innerHTML = '<p class="big" style="margin:0">'+esc(qName)+'</p><div class="score">'+qScore+' / '+QUIZ.length+'</div>'+
+    '<p class="big">in <b>'+secs+(secs===1?' second':' seconds')+'</b></p><p style="margin:12px 0 0">Winner code</p><div class="code">'+code+'</div>'+
+    '<p class="src">'+(qScore===QUIZ.length?'Perfect score. Raise your hand and show this screen to the speaker.':'Good try. Every answer above is in the toolkit tabs.')+'</p>'+
+    '<button class="btn ghost" type="button" id="qAgain">Play again</button>';
+  el('qAgain').addEventListener('click',function(){ e2.hidden=true; el('qStart').hidden=false; });
+});
+el('vBtn').addEventListener('click',function(){
+  var ok = vcode(el('vName').value, el('vScore').value, el('vTime').value) === el('vCode').value.trim().toUpperCase();
+  el('vOut').innerHTML = ok ? '<b class="green">Code matches. This result is genuine.</b>' : '<b class="red">Code does not match. Check the name, score and time are typed exactly.</b>';
+});
+</script>
+</body>
+</html>
